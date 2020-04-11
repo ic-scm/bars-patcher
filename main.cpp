@@ -208,20 +208,19 @@ int main(int argc, char** args) {
         if(nomatch == 0) {
             //Found
             barsbwavoffset = i - 0x08;
-            break;
+            std::cout << "File found at offset " << std::hex << barsbwavoffset << '\n';
+            if((unsigned long)ibarsSize - barsbwavoffset < paLen) {
+                std::cout << "Fatal error: Not enough space for header in BARS file. Is the BARS file valid?\n";
+                exit(255);
+            }
+            std::cout << "Writing patch...\n";
+            for(unsigned int i=0;i<paLen;i++) {
+                ibarsMemblock[barsbwavoffset+i] = patmpptr[i];
+            }
         }
         nomatch = 0;
     }
     if(barsbwavoffset != 0) {
-        std::cout << "File found at offset " << std::hex << barsbwavoffset << '\n';
-        if((unsigned long)ibarsSize - barsbwavoffset < paLen) {
-            std::cout << "Fatal error: Not enough space for header in BARS file. Is the BARS file valid?\n";
-            exit(255);
-        }
-        std::cout << "Writing patch...\n";
-        for(unsigned int i=0;i<paLen;i++) {
-            ibarsMemblock[barsbwavoffset+i] = patmpptr[i];
-        }
         obars.open(optargstr[1],std::ios::out | std::ios::binary | std::ios::trunc);
         if(!obars.is_open()) {
             perror("Unable to open output BARS file");
