@@ -151,9 +151,9 @@ int main(int argc, char** args) {
     unsigned char patmpptr[65536];
     unsigned int paLen;
     //Check valid magic words
-    ogbwav.read((char*)ogtmpptr,0x10);
+    ogbwav.read((char*)ogtmpptr,0x20);
     if(strcmp("BWAV",getSliceAsString(ogtmpptr,0,4)) != 0) {perror("Bad OG BWAV file"); exit(255);}
-    pabwav.read((char*)patmpptr,0x10);
+    pabwav.read((char*)patmpptr,0x20);
     if(strcmp("BWAV",getSliceAsString(patmpptr,0,4)) != 0) {perror("Bad Patch BWAV file"); exit(255);}
     //Get byte order marks
     if(getSliceAsInt16Sample(ogtmpptr,0x04,1) == -257) {
@@ -167,7 +167,8 @@ int main(int argc, char** args) {
         paBOM = 0; //Little endian
     }
     //Compare channel nums
-    if(chnum = getSliceAsNumber(ogtmpptr,0x0E,2,ogBOM) != getSliceAsNumber(patmpptr,0x0E,2,paBOM)) {
+    chnum = getSliceAsNumber(ogtmpptr,0x0E,2,ogBOM);
+    if(chnum != getSliceAsNumber(patmpptr,0x0E,2,paBOM)) {
         std::cout << "BWAV channel counts don't match.\n";
         exit(255);
     }
@@ -181,6 +182,7 @@ int main(int argc, char** args) {
     paLen = 0x10 + 0x4C*chnum;
     pabwav.seekg(0);
     pabwav.read((char*)patmpptr,paLen);
+    std::cout << "Channel count: " << chnum << " Patch length: " << paLen << '\n';
     //Close files
     ogbwav.close();
     pabwav.close();
