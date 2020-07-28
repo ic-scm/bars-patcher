@@ -1,5 +1,5 @@
-//BARS patcher for updating BWAV headers
-//Copyright (C) 2020 Extrasklep
+//BARS patcher for inserting custom BWAV headers
+//Copyright (C) 2020 I.C.
 //This code is public domain
 
 #include <iostream>
@@ -104,7 +104,7 @@ int main(int argc, char** args) {
             if(a+1 < argc) {
                 optargstr[vOpt] = args[++a];
             } else {
-                std::cout << "Option " << opts[vOpt] << " requires an argument\n";
+                std::cout << "Option " << opts[vOpt] << " requires an argument.\n";
                 exit(255);
             }
         }
@@ -152,9 +152,9 @@ int main(int argc, char** args) {
     unsigned int paLen;
     //Check valid magic words
     ogbwav.read((char*)ogtmpptr,0x20);
-    if(strcmp("BWAV",getSliceAsString(ogtmpptr,0,4)) != 0) {perror("Bad OG BWAV file"); exit(255);}
+    if(strcmp("BWAV",getSliceAsString(ogtmpptr,0,4)) != 0) {std::cout << "Orignal file is not a BWAV file.\n"; exit(255);}
     pabwav.read((char*)patmpptr,0x20);
-    if(strcmp("BWAV",getSliceAsString(patmpptr,0,4)) != 0) {perror("Bad Patch BWAV file"); exit(255);}
+    if(strcmp("BWAV",getSliceAsString(patmpptr,0,4)) != 0) {std::cout << "Patch file is not a BWAV file.\n"; exit(255);}
     //Get byte order marks
     if(getSliceAsInt16Sample(ogtmpptr,0x04,1) == -257) {
         ogBOM = 1; //Big endian
@@ -169,7 +169,7 @@ int main(int argc, char** args) {
     //Compare channel nums
     chnum = getSliceAsNumber(ogtmpptr,0x0E,2,ogBOM);
     if(chnum != getSliceAsNumber(patmpptr,0x0E,2,paBOM)) {
-        std::cout << "BWAV channel counts don't match.\n";
+        std::cout << "Both BWAV files must have the same amount of channels.\n";
         exit(255);
     }
     //Read hash from OG file
@@ -229,7 +229,7 @@ int main(int argc, char** args) {
         obars.write((char*)ibarsMemblock,ibarsSize);
         std::cout << "Done\n";
     } else {
-        std::cout << "Unable to find.\n";
+        std::cout << "Unable to find the original BWAV file in the BARS file.\n";
         exit(255);
     }
     
