@@ -1,5 +1,7 @@
 # bars-patcher
 
+**There is now a new and improved version of this tool, the [automatic BARS patcher](https://github.com/ic-scm/automatic-bars-patcher).**
+
 Simple BARS file patcher for patching BWAV headers with a custom file header
 
 Compile with standard C++ compiler without any special flag
